@@ -54,9 +54,27 @@ export default function TabLayout() {
       />
 
       <Tabs.Screen
-        name="dashboard"
+        name="profile"
         options={{
-          title: 'Dashboard',
+          title: 'Profile',
+          tabBarIcon: ({ color }) => <IconSymbol size={28} name="person.fill" color={color} />,
+          tabBarStyle: { display: 'none' },
+        }}
+      />
+
+      <Tabs.Screen
+        name="auth-gate"
+        options={{
+          title: 'AuthGateScreen',
+          tabBarIcon: ({ color }) => <IconSymbol size={28} name="house.fill" color={color} />,
+          tabBarStyle: { display: 'none' },
+        }}
+      />
+
+      <Tabs.Screen
+        name="security-setup"
+        options={{
+          title: 'SecuritySetupScreen',
           tabBarIcon: ({ color }) => <IconSymbol size={28} name="house.fill" color={color} />,
           tabBarStyle: { display: 'none' },
         }}

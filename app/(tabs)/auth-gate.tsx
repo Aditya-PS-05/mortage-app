@@ -1,7 +1,8 @@
 import { Ionicons } from '@expo/vector-icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import * as LocalAuthentication from 'expo-local-authentication';
 import { router } from 'expo-router';
-import React, { useState, useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   Alert,
   Platform,
@@ -11,7 +12,6 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
-import * as LocalAuthentication from 'expo-local-authentication';
 
 export default function AuthGateScreen() {
   const [securityMethod, setSecurityMethod] = useState<'pin' | 'biometric' | null>(null);
@@ -37,11 +37,11 @@ export default function AuthGateScreen() {
         }
       } else {
         // No security setup, go to main app
-        router.replace('/dashboard');
+        router.replace('/profile');
       }
     } catch (error) {
       console.error('Failed to check security setup:', error);
-      router.replace('/dashboard');
+      router.replace('/profile');
     } finally {
       setLoading(false);
     }
@@ -56,7 +56,7 @@ export default function AuthGateScreen() {
       });
 
       if (result.success) {
-        router.replace('/dashboard');
+        router.replace('/profile');
       } else {
         if (result.error === 'user_cancel') {
           Alert.alert('Authentication Required', 'You must authenticate to access the app.');
@@ -91,7 +91,7 @@ export default function AuthGateScreen() {
       try {
         const storedPin = await AsyncStorage.getItem('securityPin');
         if (pin === storedPin) {
-          router.replace('/dashboard');
+          router.replace('/profile');
         } else {
           const newAttempts = authAttempts + 1;
           setAuthAttempts(newAttempts);

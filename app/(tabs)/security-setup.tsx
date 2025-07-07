@@ -1,7 +1,7 @@
 import { Ionicons } from '@expo/vector-icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { router } from 'expo-router';
-import React, { useState } from 'react';
+import { router, useLocalSearchParams } from 'expo-router';
+import React, { useState, useEffect } from 'react';
 import {
   Alert,
   Platform,
@@ -14,13 +14,27 @@ import {
 import * as LocalAuthentication from 'expo-local-authentication';
 
 export default function SecuritySetupScreen() {
+  const params = useLocalSearchParams<{ switchTo?: string; currentMethod?: string }>();
   const [selectedMethod, setSelectedMethod] = useState<'pin' | 'biometric' | null>(null);
   const [pin, setPin] = useState('');
   const [confirmPin, setConfirmPin] = useState('');
   const [step, setStep] = useState<'choose' | 'setup-pin' | 'confirm-pin'>('choose');
   const [loading, setLoading] = useState(false);
+  const [isSwitch, setIsSwitch] = useState(false);
 
   const primaryColor = Platform.OS === 'android' ? '#4CAF50' : '#4F7DF3';
+
+  useEffect(() => {
+    if (params.switchTo && params.currentMethod) {
+      setIsSwitch(true);
+      setSelectedMethod(params.switchTo as 'pin' | 'biometric');
+      if (params.switchTo === 'pin') {
+        setStep('setup-pin');
+      } else {
+        handleBiometricSetup();
+      }
+    }
+  }, [params]);
 
   const checkBiometricSupport = async () => {
     const compatible = await LocalAuthentication.hasHardwareAsync();
@@ -63,8 +77,8 @@ export default function SecuritySetupScreen() {
         
         Alert.alert(
           'Success',
-          'Biometric authentication has been set up successfully!',
-          [{ text: 'OK', onPress: () => router.replace('/dashboard') }]
+          isSwitch ? 'Biometric authentication has been updated successfully!' : 'Biometric authentication has been set up successfully!',
+          [{ text: 'OK', onPress: () => router.replace('/profile') }]
         );
       } else {
         Alert.alert('Setup Failed', 'Biometric setup was cancelled or failed.');
@@ -109,8 +123,8 @@ export default function SecuritySetupScreen() {
           
           Alert.alert(
             'Success',
-            'PIN has been set up successfully!',
-            [{ text: 'OK', onPress: () => router.replace('/dashboard') }]
+            isSwitch ? 'PIN has been updated successfully!' : 'PIN has been set up successfully!',
+            [{ text: 'OK', onPress: () => router.replace('/profile') }]
           );
         } catch (error) {
           Alert.alert('Error', 'Failed to save PIN.');
@@ -134,9 +148,9 @@ export default function SecuritySetupScreen() {
         </View>
       </View>
 
-      <Text style={styles.title}>Secure Your Account</Text>
+      <Text style={styles.title}>{isSwitch ? 'Update Security Method' : 'Secure Your Account'}</Text>
       <Text style={styles.subtitle}>
-        Choose how you'd like to secure your account for future logins
+        {isSwitch ? 'Choose your new security method' : 'Choose how you\'d like to secure your account for future logins'}
       </Text>
 
       <View style={styles.methodContainer}>
@@ -159,12 +173,14 @@ export default function SecuritySetupScreen() {
         </TouchableOpacity>
       </View>
 
-      <TouchableOpacity
-        style={styles.skipButton}
-        onPress={() => router.replace('/dashboard')}
-      >
-        <Text style={styles.skipButtonText}>Skip for now</Text>
-      </TouchableOpacity>
+      {!isSwitch && (
+        <TouchableOpacity
+          style={styles.skipButton}
+          onPress={() => router.replace('/profile')}
+        >
+          <Text style={styles.skipButtonText}>Skip for now</Text>
+        </TouchableOpacity>
+      )}
     </View>
   );
 
@@ -251,13 +267,13 @@ export default function SecuritySetupScreen() {
               setPin('');
               setSelectedMethod(null);
             } else {
-              router.back();
+              isSwitch ? router.replace('/profile') : router.back();
             }
           }}
         >
           <Ionicons name="arrow-back" size={24} color={primaryColor} />
         </TouchableOpacity>
-        <Text style={styles.headerTitle}>Security Setup</Text>
+        <Text style={styles.headerTitle}>{isSwitch ? 'Change Security' : 'Security Setup'}</Text>
         <View style={styles.placeholder} />
       </View>
 

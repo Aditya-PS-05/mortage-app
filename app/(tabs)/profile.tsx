@@ -11,6 +11,7 @@ import {
 import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import * as LocalAuthentication from 'expo-local-authentication';
 
 interface UserData {
   id: string;
@@ -20,12 +21,14 @@ interface UserData {
   createdAt: string;
 }
 
-export default function DashboardScreen() {
+export default function ProfileScreen() {
   const [userData, setUserData] = useState<UserData | null>(null);
   const [loading, setLoading] = useState(true);
+  const [securityMethod, setSecurityMethod] = useState<'pin' | 'biometric' | null>(null);
 
   useEffect(() => {
     loadUserData();
+    loadSecurityMethod();
   }, []);
 
   const loadUserData = async () => {
@@ -46,6 +49,15 @@ export default function DashboardScreen() {
       Alert.alert('Error', 'Failed to load user data');
     } finally {
       setLoading(false);
+    }
+  };
+
+  const loadSecurityMethod = async () => {
+    try {
+      const method = await AsyncStorage.getItem('securityMethod');
+      setSecurityMethod(method as 'pin' | 'biometric' | null);
+    } catch (error) {
+      console.error('Error loading security method:', error);
     }
   };
 
@@ -83,6 +95,53 @@ export default function DashboardScreen() {
       day: 'numeric',
       hour: '2-digit',
       minute: '2-digit',
+    });
+  };
+
+  const handleSecurityMethodChange = () => {
+    Alert.alert(
+      'Change Security Method',
+      `Current method: ${securityMethod === 'pin' ? 'PIN' : securityMethod === 'biometric' ? 'Biometric' : 'None'}\n\nWhat would you like to change to?`,
+      [
+        { text: 'Cancel', style: 'cancel' },
+        {
+          text: 'Switch to PIN',
+          onPress: () => switchSecurityMethod('pin'),
+          style: securityMethod === 'pin' ? 'cancel' : 'default'
+        },
+        {
+          text: 'Switch to Biometric',
+          onPress: () => switchSecurityMethod('biometric'),
+          style: securityMethod === 'biometric' ? 'cancel' : 'default'
+        }
+      ]
+    );
+  };
+
+  const switchSecurityMethod = async (newMethod: 'pin' | 'biometric') => {
+    if (newMethod === securityMethod) {
+      Alert.alert('Info', `You are already using ${newMethod === 'pin' ? 'PIN' : 'Biometric'} authentication.`);
+      return;
+    }
+
+    if (newMethod === 'biometric') {
+      const compatible = await LocalAuthentication.hasHardwareAsync();
+      const enrolled = await LocalAuthentication.isEnrolledAsync();
+      
+      if (!compatible || !enrolled) {
+        Alert.alert(
+          'Biometric Not Available',
+          'Please set up biometric authentication in your device settings first.',
+          [{ text: 'OK' }]
+        );
+        return;
+      }
+    }
+
+    // Navigate to security setup with the new method
+    router.push({
+      pathname: '/security-setup',
+      params: { switchTo: newMethod, currentMethod: securityMethod }
     });
   };
 
@@ -206,13 +265,17 @@ export default function DashboardScreen() {
             <Ionicons name="chevron-forward" size={20} color="#CCC" />
           </TouchableOpacity>
 
-          <TouchableOpacity style={styles.actionButton}>
+          <TouchableOpacity style={styles.actionButton} onPress={handleSecurityMethodChange}>
             <View style={styles.actionIcon}>
               <Ionicons name="shield-checkmark-outline" size={24} color="#4F7DF3" />
             </View>
             <View style={styles.actionContent}>
-              <Text style={styles.actionTitle}>Security</Text>
-              <Text style={styles.actionSubtext}>Password and security settings</Text>
+              <Text style={styles.actionTitle}>Security Method</Text>
+              <Text style={styles.actionSubtext}>
+                {securityMethod === 'pin' ? 'Currently using PIN' : 
+                 securityMethod === 'biometric' ? 'Currently using Biometric' : 
+                 'No security method set'}
+              </Text>
             </View>
             <Ionicons name="chevron-forward" size={20} color="#CCC" />
           </TouchableOpacity>
