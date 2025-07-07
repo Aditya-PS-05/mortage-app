@@ -1,7 +1,7 @@
 import { Ionicons } from '@expo/vector-icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { router } from 'expo-router';
-import React, { useState } from 'react';
+import { router, useLocalSearchParams } from 'expo-router';
+import React, { useState, useEffect } from 'react';
 import {
   ActivityIndicator,
   Alert,
@@ -12,9 +12,11 @@ import {
   TextInput,
   TouchableOpacity,
   View,
+  Platform,
 } from 'react-native';
 
 export default function LoginScreen() {
+  const params = useLocalSearchParams();
   const [loginMethod, setLoginMethod] = useState<'email' | 'phone'>('email');
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -23,6 +25,18 @@ export default function LoginScreen() {
     phone: '',
     password: '',
   });
+
+  const primaryColor = Platform.OS === 'android' ? '#4CAF50' : '#4F7DF3';
+
+  useEffect(() => {
+    if (params.email) {
+      setFormData(prev => ({ ...prev, email: params.email as string }));
+      setLoginMethod('email');
+    } else if (params.phone) {
+      setFormData(prev => ({ ...prev, phone: params.phone as string }));
+      setLoginMethod('phone');
+    }
+  }, [params]);
 
   const API_BASE_URL = 'http://192.168.104.153:3001/api';
 
@@ -231,7 +245,7 @@ export default function LoginScreen() {
         {/* Create Account Link */}
         <View style={styles.createAccountContainer}>
           <Text style={styles.createAccountText}>Don't have an account? </Text>
-          <TouchableOpacity onPress={() => router.push('/signup')}>
+          <TouchableOpacity onPress={() => router.push({ pathname: '/signup', params })}>
             <Text style={styles.createAccountLink}>Create Account</Text>
           </TouchableOpacity>
         </View>
@@ -293,7 +307,7 @@ const styles = StyleSheet.create({
   iconBackground: {
     width: 80,
     height: 80,
-    backgroundColor: '#4F7DF3',
+    backgroundColor: Platform.OS === 'android' ? '#4CAF50' : '#4F7DF3',
     borderRadius: 20,
     alignItems: 'center',
     justifyContent: 'center',
@@ -350,7 +364,7 @@ const styles = StyleSheet.create({
     color: '#666',
   },
   toggleButtonTextActive: {
-    color: '#4F7DF3',
+    color: Platform.OS === 'android' ? '#4CAF50' : '#4F7DF3',
     fontWeight: '600',
   },
   formContainer: {
@@ -400,11 +414,11 @@ const styles = StyleSheet.create({
   },
   forgotPasswordText: {
     fontSize: 14,
-    color: '#4F7DF3',
+    color: Platform.OS === 'android' ? '#4CAF50' : '#4F7DF3',
     fontWeight: '500',
   },
   signInButton: {
-    backgroundColor: '#4F7DF3',
+    backgroundColor: Platform.OS === 'android' ? '#4CAF50' : '#4F7DF3',
     borderRadius: 12,
     paddingVertical: 18,
     alignItems: 'center',
@@ -430,7 +444,7 @@ const styles = StyleSheet.create({
   },
   createAccountLink: {
     fontSize: 16,
-    color: '#4F7DF3',
+    color: Platform.OS === 'android' ? '#4CAF50' : '#4F7DF3',
     fontWeight: '600',
   },
   dividerContainer: {

@@ -16,6 +16,14 @@ This is a React Native Expo mortgage application targeting the US market. The ap
 - **Lint code**: `npm run lint`
 - **Reset project**: `npm run reset-project` (moves starter code to app-example directory)
 
+### Backend Development Commands
+
+- **Install backend dependencies**: `cd backend && npm install`
+- **Start backend server**: `cd backend && npm run dev`
+- **Run database migrations**: `cd backend && npm run db:migrate`
+- **Generate Prisma client**: `cd backend && npm run db:generate`
+- **Open Prisma Studio**: `cd backend && npm run db:studio`
+
 ## Architecture
 
 ### Navigation Structure
@@ -42,6 +50,26 @@ This is a React Native Expo mortgage application targeting the US market. The ap
 - TypeScript configuration
 - ESLint with Expo configuration
 
+## Backend Architecture
+
+### Database & ORM
+- PostgreSQL database with Prisma ORM
+- User model supports multiple authentication methods (email, phone, username)
+- Database migrations managed through Prisma
+
+### API Structure
+- Express.js server with security middleware (helmet, cors, rate limiting)
+- JWT-based authentication
+- Input validation using express-validator
+- Password hashing with bcryptjs
+
+### Key Backend Technologies
+- Node.js with Express.js
+- Prisma for database operations
+- JWT for authentication
+- bcryptjs for password hashing
+- Express middleware for security and validation
+
 ## Security Focus
 Based on Project.md, this app implements:
 - Multiple login methods (phone, email, username)
@@ -56,3 +84,4 @@ Based on Project.md, this app implements:
 - `assets/` contains fonts and images
 - `constants/` contains app-wide constants
 - `hooks/` contains custom React hooks
+- `backend/` contains the Node.js API server with Prisma database setup
