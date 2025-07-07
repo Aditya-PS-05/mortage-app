@@ -1,6 +1,7 @@
 import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import React, { useEffect, useState } from 'react';
+
 import {
   Animated,
   KeyboardAvoidingView,
@@ -19,6 +20,7 @@ interface UserInfo {
   name: string;
   phone: string;
   email: string;
+  [key: string]: string;
 }
 
 export default function HomeScreen() {
@@ -299,7 +301,9 @@ export default function HomeScreen() {
     <ScrollView style={[styles.container, { backgroundColor: currentColors.background }]}>
       {renderBackButton()}
       <View style={styles.educationContainer}>
-        <Text style={styles.educationTitle}>Mortgage Education</Text>
+        <View style={styles.educationHeader}>
+          <Text style={styles.educationTitle}>Mortgage Education</Text>
+        </View>
         
         {/* FICO Section */}
         <View style={styles.educationSection}>
@@ -497,11 +501,15 @@ const styles = StyleSheet.create({
   educationContainer: {
     padding: 24,
   },
+  educationHeader: {
+    alignItems: 'center',
+    marginTop: 40,
+    marginBottom: 32,
+  },
   educationTitle: {
     fontSize: 28,
     fontWeight: 'bold',
     textAlign: 'center',
-    marginBottom: 32,
     color: '#333',
   },
   educationSection: {

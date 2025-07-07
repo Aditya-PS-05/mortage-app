@@ -36,7 +36,7 @@ export default function LoginScreen() {
       setFormData(prev => ({ ...prev, phone: params.phone as string }));
       setLoginMethod('phone');
     }
-  }, [params]);
+  }, [params.email, params.phone]);
 
   const API_BASE_URL = 'http://192.168.104.153:3001/api';
 
