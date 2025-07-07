@@ -40,7 +40,7 @@ export default function SignupScreen() {
       setFormData(prev => ({ ...prev, phone: params.phone as string }));
       setRegistrationMethod('phone');
     }
-  }, [params]);
+  }, [params.name, params.email, params.phone]);
 
   // const BACKEND_BASE_URL = process.env.BACKEND_BASE_URL;
 
