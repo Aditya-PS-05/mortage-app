@@ -409,16 +409,9 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   animatedBox: {
-    backgroundColor: '#f5f5f5',
     paddingHorizontal: 32,
     paddingVertical: 24,
-    borderRadius: 16,
     marginBottom: 32,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.1,
-    shadowRadius: 8,
-    elevation: 5,
   },
   introText: {
     fontSize: 24,
