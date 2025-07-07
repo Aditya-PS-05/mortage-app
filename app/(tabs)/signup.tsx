@@ -120,10 +120,10 @@ export default function SignupScreen() {
             {
               text: 'OK',
               onPress: async () => {
-                // Store user data and token, then navigate to dashboard
+                // Store user data and token, then navigate to security setup
                 await AsyncStorage.setItem('userToken', data.data.token);
                 await AsyncStorage.setItem('userData', JSON.stringify(data.data.user));
-                router.replace('/login');
+                router.replace('/security-setup');
               }
             }
           ]

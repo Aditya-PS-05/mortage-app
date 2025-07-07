@@ -283,7 +283,7 @@ export default function HomeScreen() {
             style={[styles.choiceButton, { backgroundColor: currentColors.primary }]} 
             onPress={() => router.push({ pathname: '/login', params: userInfo })}
           >
-            <Text style={styles.choiceButtonText}>Start Application</Text>
+            <Text style={styles.choiceButtonText}>Get Started</Text>
           </TouchableOpacity>
           
           <TouchableOpacity 

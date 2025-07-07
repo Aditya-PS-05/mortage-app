@@ -97,7 +97,7 @@ export default function LoginScreen() {
             {
               text: 'OK',
               onPress: () => {
-                router.replace('/dashboard');
+                router.replace('/auth-gate');
               }
             }
           ]
@@ -250,18 +250,6 @@ export default function LoginScreen() {
           </TouchableOpacity>
         </View>
 
-        {/* Divider */}
-        <View style={styles.dividerContainer}>
-          <View style={styles.dividerLine} />
-          <Text style={styles.dividerText}>OR</Text>
-          <View style={styles.dividerLine} />
-        </View>
-
-        {/* Biometric Sign In */}
-        <TouchableOpacity style={styles.biometricButton}>
-          <Ionicons name="finger-print" size={24} color="#4F7DF3" />
-          <Text style={styles.biometricButtonText}>Sign in with Biometrics</Text>
-        </TouchableOpacity>
       </ScrollView>
     </SafeAreaView>
   );
@@ -444,38 +432,5 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: Platform.OS === 'android' ? '#4CAF50' : '#4F7DF3',
     fontWeight: '600',
-  },
-  dividerContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: 24,
-  },
-  dividerLine: {
-    flex: 1,
-    height: 1,
-    backgroundColor: '#E5E5E5',
-  },
-  dividerText: {
-    fontSize: 14,
-    color: '#666',
-    marginHorizontal: 16,
-    fontWeight: '500',
-  },
-  biometricButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: 'white',
-    borderWidth: 1,
-    borderColor: '#4F7DF3',
-    borderRadius: 12,
-    paddingVertical: 16,
-    paddingHorizontal: 24,
-  },
-  biometricButtonText: {
-    fontSize: 16,
-    color: '#4F7DF3',
-    fontWeight: '600',
-    marginLeft: 12,
   },
 });
