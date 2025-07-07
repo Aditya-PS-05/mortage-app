@@ -145,7 +145,7 @@ export default function SignupScreen() {
         {/* Header */}
         <View style={styles.header}>
           <TouchableOpacity style={styles.backButton} onPress={() => router.back()}>
-            <Ionicons name="chevron-back" size={24} color="#333" />
+            <Ionicons name="arrow-back" size={24} color={Platform.OS === 'android' ? '#4CAF50' : '#4F7DF3'} />
           </TouchableOpacity>
           <Text style={styles.headerTitle}>Create Account</Text>
           <View style={styles.placeholder} />
@@ -334,8 +334,6 @@ const styles = StyleSheet.create({
   backButton: {
     width: 40,
     height: 40,
-    borderRadius: 20,
-    backgroundColor: '#F5F5F5',
     alignItems: 'center',
     justifyContent: 'center',
   },
