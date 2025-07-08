@@ -79,6 +79,15 @@ export default function TabLayout() {
           tabBarStyle: { display: 'none' },
         }}
       />
+
+      <Tabs.Screen
+        name="otp-verification"
+        options={{
+          title: 'OTPVerificationScreen',
+          tabBarIcon: ({ color }) => <IconSymbol size={28} name="mail.fill" color={color} />,
+          tabBarStyle: { display: 'none' },
+        }}
+      />
     </Tabs>
   );
 }

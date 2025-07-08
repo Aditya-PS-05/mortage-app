@@ -1,10 +1,10 @@
 import { Ionicons } from '@expo/vector-icons';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import { router, useLocalSearchParams } from 'expo-router';
-import React, { useState, useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   ActivityIndicator,
   Alert,
+  Platform,
   SafeAreaView,
   ScrollView,
   StyleSheet,
@@ -12,7 +12,6 @@ import {
   TextInput,
   TouchableOpacity,
   View,
-  Platform,
 } from 'react-native';
 
 export default function SignupScreen() {
@@ -44,7 +43,7 @@ export default function SignupScreen() {
 
   // const BACKEND_BASE_URL = process.env.BACKEND_BASE_URL;
 
-  const API_BASE_URL = 'http://192.168.104.153:3001/api';
+  const API_BASE_URL = 'http://192.168.216.153:3001/api';
 
   const handleInputChange = (field: string, value: string) => {
     setFormData(prev => ({ ...prev, [field]: value }));
@@ -115,15 +114,19 @@ export default function SignupScreen() {
       if (data.success) {
         Alert.alert(
           'Success',
-          'Account created successfully!',
+          'Account created successfully! Please verify your account.',
           [
             {
               text: 'OK',
-              onPress: async () => {
-                // Store user data and token, then navigate to security setup
-                await AsyncStorage.setItem('userToken', data.data.token);
-                await AsyncStorage.setItem('userData', JSON.stringify(data.data.user));
-                router.replace('/security-setup');
+              onPress: () => {
+                router.push({
+                  pathname: '/otp-verification',
+                  params: {
+                    email: registrationMethod === 'email' ? formData.email : undefined,
+                    phone: registrationMethod === 'phone' ? formData.phone : undefined,
+                    registrationMethod: registrationMethod,
+                  },
+                });
               }
             }
           ]

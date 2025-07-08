@@ -199,7 +199,123 @@ const login = async (req, res) => {
   }
 };
 
+const verifyOtp = async (req, res) => {
+  try {
+    const { otp, registrationMethod, email, phone } = req.body;
+
+    // Demo OTP bypass - accepts 951753
+    if (otp === '951753') {
+      // Find user based on registration method
+      let user;
+      if (registrationMethod === 'email') {
+        user = await prisma.user.findUnique({
+          where: { email }
+        });
+      } else {
+        user = await prisma.user.findUnique({
+          where: { phone }
+        });
+      }
+
+      if (!user) {
+        return res.status(404).json({
+          success: false,
+          message: 'User not found'
+        });
+      }
+
+      // Generate JWT token
+      const token = generateToken(user.id);
+
+      // Return user data without password
+      const userData = {
+        id: user.id,
+        email: user.email,
+        phone: user.phone,
+        username: user.username,
+        createdAt: user.createdAt
+      };
+
+      console.log(`✅ OTP verified successfully for user:`, {
+        id: user.id,
+        email: user.email,
+        phone: user.phone,
+        username: user.username
+      });
+
+      return res.json({
+        success: true,
+        message: 'OTP verified successfully',
+        data: {
+          user: userData,
+          token
+        }
+      });
+    }
+
+    // Invalid OTP
+    return res.status(400).json({
+      success: false,
+      message: 'Invalid OTP'
+    });
+
+  } catch (error) {
+    console.error('OTP verification error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Internal server error'
+    });
+  }
+};
+
+const resendOtp = async (req, res) => {
+  try {
+    const { registrationMethod, email, phone } = req.body;
+
+    // Find user based on registration method
+    let user;
+    if (registrationMethod === 'email') {
+      user = await prisma.user.findUnique({
+        where: { email }
+      });
+    } else {
+      user = await prisma.user.findUnique({
+        where: { phone }
+      });
+    }
+
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: 'User not found'
+      });
+    }
+
+    // For demo purposes, always return success
+    console.log(`📱 OTP resent (demo) for user:`, {
+      id: user.id,
+      email: user.email,
+      phone: user.phone,
+      username: user.username
+    });
+
+    res.json({
+      success: true,
+      message: 'OTP sent successfully'
+    });
+
+  } catch (error) {
+    console.error('Resend OTP error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Internal server error'
+    });
+  }
+};
+
 module.exports = {
   signup,
-  login
+  login,
+  verifyOtp,
+  resendOtp
 };
