@@ -8,6 +8,7 @@ import {
   Alert,
   Platform,
   SafeAreaView,
+  ScrollView,
   StyleSheet,
   Text,
   TouchableOpacity,
@@ -160,98 +161,104 @@ export default function OTPVerificationScreen() {
         <View style={styles.placeholder} />
       </View>
 
-      <View style={styles.content}>
-        {/* Icon */}
-        <View style={styles.iconContainer}>
-          <View style={[styles.iconBackground, { backgroundColor: primaryColor }]}>
-            <Ionicons name="mail" size={32} color="white" />
-          </View>
-        </View>
-
-        {/* Title */}
-        <Text style={styles.title}>Enter Verification Code</Text>
-        <Text style={styles.subtitle}>
-          We&apos;ve sent a 6-digit code to your {getContactType()}
-        </Text>
-        <Text style={styles.contactInfo}>{getContactInfo()}</Text>
-
-        {/* OTP Input */}
-        <View style={styles.otpContainer}>
-          {[0, 1, 2, 3, 4, 5].map((index) => (
-            <View
-              key={index}
-              style={[
-                styles.otpBox,
-                {
-                  borderColor: otp.length > index ? primaryColor : '#E5E5E5',
-                  backgroundColor: otp.length > index ? `${primaryColor}10` : 'white',
-                }
-              ]}
-            >
-              <Text style={[styles.otpText, { color: otp.length > index ? primaryColor : '#999' }]}>
-                {otp[index] || ''}
-              </Text>
+      <ScrollView 
+        contentContainerStyle={styles.scrollContent}
+        showsVerticalScrollIndicator={false}
+        keyboardShouldPersistTaps="handled"
+      >
+        <View style={styles.content}>
+          {/* Icon */}
+          <View style={styles.iconContainer}>
+            <View style={[styles.iconBackground, { backgroundColor: primaryColor }]}>
+              <Ionicons name="mail" size={32} color="white" />
             </View>
-          ))}
-        </View>
+          </View>
 
-        {/* Keypad */}
-        <View style={styles.keypad}>
-          {[1, 2, 3, 4, 5, 6, 7, 8, 9].map((digit) => (
+          {/* Title */}
+          <Text style={styles.title}>Enter Verification Code</Text>
+          <Text style={styles.subtitle}>
+            We&apos;ve sent a 6-digit code to your {getContactType()}
+          </Text>
+          <Text style={styles.contactInfo}>{getContactInfo()}</Text>
+
+          {/* OTP Input */}
+          <View style={styles.otpContainer}>
+            {[0, 1, 2, 3, 4, 5].map((index) => (
+              <View
+                key={index}
+                style={[
+                  styles.otpBox,
+                  {
+                    borderColor: otp.length > index ? primaryColor : '#E5E5E5',
+                    backgroundColor: otp.length > index ? `${primaryColor}10` : 'white',
+                  }
+                ]}
+              >
+                <Text style={[styles.otpText, { color: otp.length > index ? primaryColor : '#999' }]}>
+                  {otp[index] || ''}
+                </Text>
+              </View>
+            ))}
+          </View>
+
+          {/* Keypad */}
+          <View style={styles.keypad}>
+            {[1, 2, 3, 4, 5, 6, 7, 8, 9].map((digit) => (
+              <TouchableOpacity
+                key={digit}
+                style={styles.keypadButton}
+                onPress={() => handleOtpInput(digit.toString())}
+              >
+                <Text style={styles.keypadText}>{digit}</Text>
+              </TouchableOpacity>
+            ))}
+            <View style={styles.keypadButton} />
             <TouchableOpacity
-              key={digit}
               style={styles.keypadButton}
-              onPress={() => handleOtpInput(digit.toString())}
+              onPress={() => handleOtpInput('0')}
             >
-              <Text style={styles.keypadText}>{digit}</Text>
+              <Text style={styles.keypadText}>0</Text>
             </TouchableOpacity>
-          ))}
-          <View style={styles.keypadButton} />
-          <TouchableOpacity
-            style={styles.keypadButton}
-            onPress={() => handleOtpInput('0')}
-          >
-            <Text style={styles.keypadText}>0</Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={styles.keypadButton}
-            onPress={handleOtpDelete}
-          >
-            <Ionicons name="backspace" size={24} color="#666" />
-          </TouchableOpacity>
-        </View>
+            <TouchableOpacity
+              style={styles.keypadButton}
+              onPress={handleOtpDelete}
+            >
+              <Ionicons name="backspace" size={24} color="#666" />
+            </TouchableOpacity>
+          </View>
 
-        {/* Verify Button */}
-        {otp.length === 6 && (
-          <TouchableOpacity
-            style={[styles.verifyButton, { backgroundColor: primaryColor }]}
-            onPress={handleVerifyOtp}
-            disabled={loading}
-          >
-            {loading ? (
-              <ActivityIndicator color="white" size="small" />
-            ) : (
-              <Text style={styles.verifyButtonText}>Verify OTP</Text>
-            )}
-          </TouchableOpacity>
-        )}
-
-        {/* Resend OTP */}
-        <View style={styles.resendContainer}>
-          <Text style={styles.resendText}>Didn&apos;t receive the code? </Text>
-          {canResend ? (
-            <TouchableOpacity onPress={handleResendOtp} disabled={resendLoading}>
-              {resendLoading ? (
-                <ActivityIndicator color={primaryColor} size="small" />
+          {/* Verify Button */}
+          {otp.length === 6 && (
+            <TouchableOpacity
+              style={[styles.verifyButton, { backgroundColor: primaryColor }]}
+              onPress={handleVerifyOtp}
+              disabled={loading}
+            >
+              {loading ? (
+                <ActivityIndicator color="white" size="small" />
               ) : (
-                <Text style={[styles.resendLink, { color: primaryColor }]}>Resend</Text>
+                <Text style={styles.verifyButtonText}>Verify OTP</Text>
               )}
             </TouchableOpacity>
-          ) : (
-            <Text style={styles.resendTimer}>Resend in {resendTimer}s</Text>
           )}
+
+          {/* Resend OTP */}
+          <View style={styles.resendContainer}>
+            <Text style={styles.resendText}>Didn&apos;t receive the code? </Text>
+            {canResend ? (
+              <TouchableOpacity onPress={handleResendOtp} disabled={resendLoading}>
+                {resendLoading ? (
+                  <ActivityIndicator color={primaryColor} size="small" />
+                ) : (
+                  <Text style={[styles.resendLink, { color: primaryColor }]}>Resend</Text>
+                )}
+              </TouchableOpacity>
+            ) : (
+              <Text style={styles.resendTimer}>Resend in {resendTimer}s</Text>
+            )}
+          </View>
         </View>
-      </View>
+      </ScrollView>
     </SafeAreaView>
   );
 }
@@ -283,11 +290,15 @@ const styles = StyleSheet.create({
   placeholder: {
     width: 40,
   },
+  scrollContent: {
+    flexGrow: 1,
+    paddingBottom: 40,
+  },
   content: {
-    flex: 1,
     alignItems: 'center',
     paddingHorizontal: 24,
     paddingTop: 40,
+    minHeight: 700,
   },
   iconContainer: {
     alignItems: 'center',
@@ -342,7 +353,7 @@ const styles = StyleSheet.create({
     flexWrap: 'wrap',
     width: 240,
     gap: 16,
-    marginBottom: 32,
+    marginBottom: 48,
   },
   keypadButton: {
     width: 64,
@@ -366,7 +377,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 48,
     paddingVertical: 16,
     borderRadius: 12,
-    marginBottom: 24,
+    marginBottom: 32,
   },
   verifyButtonText: {
     color: 'white',
