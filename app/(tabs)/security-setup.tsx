@@ -1,8 +1,10 @@
 import { Ionicons } from '@expo/vector-icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import * as LocalAuthentication from 'expo-local-authentication';
 import { router, useLocalSearchParams } from 'expo-router';
-import React, { useState, useEffect } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import {
+  ActivityIndicator,
   Alert,
   Platform,
   SafeAreaView,
@@ -11,7 +13,6 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
-import * as LocalAuthentication from 'expo-local-authentication';
 
 export default function SecuritySetupScreen() {
   const params = useLocalSearchParams<{ switchTo?: string; currentMethod?: string }>();
@@ -24,23 +25,128 @@ export default function SecuritySetupScreen() {
 
   const primaryColor = Platform.OS === 'android' ? '#4CAF50' : '#4F7DF3';
 
+  const checkBiometricSupport = useCallback(async () => {
+    try {
+      const compatible = await LocalAuthentication.hasHardwareAsync();
+      const enrolled = await LocalAuthentication.isEnrolledAsync();
+      return compatible && enrolled;
+    } catch (error) {
+      console.error('Error checking biometric support:', error);
+      return false;
+    }
+  }, []);
+
+  const handleBiometricSetup = useCallback(async () => {
+    setLoading(true);
+    try {
+      // First check if biometric is available
+      const supported = await checkBiometricSupport();
+      if (!supported) {
+        Alert.alert(
+          'Biometric Not Available',
+          'Please set up biometric authentication in your device settings first.',
+          [{ text: 'OK', onPress: () => {
+            setLoading(false);
+            if (isSwitch) {
+              router.replace('/profile');
+            } else {
+              setStep('choose');
+              setSelectedMethod(null);
+            }
+          }}]
+        );
+        return;
+      }
+
+      const result = await LocalAuthentication.authenticateAsync({
+        promptMessage: isSwitch ? 'Verify your identity to switch to biometric authentication' : 'Set up biometric authentication',
+        fallbackLabel: 'Cancel',
+        disableDeviceFallback: false,
+      });
+
+      if (result.success) {
+        // Remove any existing PIN data when switching to biometric
+        if (isSwitch) {
+          await AsyncStorage.removeItem('securityPin');
+        }
+        
+        await AsyncStorage.setItem('securityMethod', 'biometric');
+        await AsyncStorage.setItem('securityEnabled', 'true');
+        
+        Alert.alert(
+          'Success',
+          isSwitch ? 'Biometric authentication has been updated successfully!' : 'Biometric authentication has been set up successfully!',
+          [{ text: 'OK', onPress: () => router.replace('/profile') }]
+        );
+      } else {
+        // Handle failed authentication
+        const errorType = 'error' in result ? result.error : null;
+        // const isUserCancel = errorType === 'UserCancel' || 
+        //                    errorType === 'UserFallback' || 
+        //                    errorType === 'SystemCancel';
+        
+        // const errorMessage = isUserCancel 
+        //   ? 'Biometric setup was cancelled.'
+        //   : 'Biometric setup failed. Please try again.';
+
+        const isUserCancel = false;
+        const errorMessage = "Biomatric setup cancelled";
+        
+        Alert.alert(
+          isUserCancel ? 'Setup Cancelled' : 'Setup Failed',
+          errorMessage,
+          [{ text: 'OK', onPress: () => {
+            if (isSwitch) {
+              router.replace('/profile');
+            } else {
+              setStep('choose');
+              setSelectedMethod(null);
+            }
+          }}]
+        );
+      }
+    } catch (error) {
+      console.error('Biometric setup error:', error);
+      Alert.alert(
+        'Error',
+        'Failed to set up biometric authentication. Please try again.',
+        [{ text: 'OK', onPress: () => {
+          if (isSwitch) {
+            router.replace('/profile');
+          } else {
+            setStep('choose');
+            setSelectedMethod(null);
+          }
+        }}]
+      );
+    } finally {
+      setLoading(false);
+    }
+  }, [isSwitch, checkBiometricSupport]);
+
   useEffect(() => {
+    let timeoutId: NodeJS.Timeout;
+    
     if (params.switchTo && params.currentMethod) {
       setIsSwitch(true);
       setSelectedMethod(params.switchTo as 'pin' | 'biometric');
+      
       if (params.switchTo === 'pin') {
         setStep('setup-pin');
-      } else {
-        handleBiometricSetup();
+      } else if (params.switchTo === 'biometric') {
+        // Small delay to ensure component is fully mounted
+        // timeoutId = setTimeout(() => {
+        //   handleBiometricSetup();
+        // }, 100);
       }
     }
-  }, [params]);
 
-  const checkBiometricSupport = async () => {
-    const compatible = await LocalAuthentication.hasHardwareAsync();
-    const enrolled = await LocalAuthentication.isEnrolledAsync();
-    return compatible && enrolled;
-  };
+    return () => {
+      // if (timeoutId) {
+      //   clearTimeout(timeoutId);
+      // }
+    };
+  }, [params, handleBiometricSetup]);
 
   const handleMethodSelect = async (method: 'pin' | 'biometric') => {
     if (method === 'biometric') {
@@ -63,32 +169,6 @@ export default function SecuritySetupScreen() {
     }
   };
 
-  const handleBiometricSetup = async () => {
-    setLoading(true);
-    try {
-      const result = await LocalAuthentication.authenticateAsync({
-        promptMessage: 'Set up biometric authentication',
-        fallbackLabel: 'Use PIN instead',
-      });
-
-      if (result.success) {
-        await AsyncStorage.setItem('securityMethod', 'biometric');
-        await AsyncStorage.setItem('securityEnabled', 'true');
-        
-        Alert.alert(
-          'Success',
-          isSwitch ? 'Biometric authentication has been updated successfully!' : 'Biometric authentication has been set up successfully!',
-          [{ text: 'OK', onPress: () => router.replace('/profile') }]
-        );
-      } else {
-        Alert.alert('Setup Failed', 'Biometric setup was cancelled or failed.');
-      }
-    } catch (error) {
-      Alert.alert('Error', 'Failed to set up biometric authentication.');
-    } finally {
-      setLoading(false);
-    }
-  };
 
   const handlePinInput = (digit: string) => {
     if (step === 'setup-pin') {
@@ -117,6 +197,11 @@ export default function SecuritySetupScreen() {
       if (pin === confirmPin) {
         setLoading(true);
         try {
+          // Remove any existing biometric data when switching to PIN
+          if (isSwitch) {
+            await AsyncStorage.removeItem('biometricEnabled');
+          }
+          
           await AsyncStorage.setItem('securityMethod', 'pin');
           await AsyncStorage.setItem('securityPin', pin);
           await AsyncStorage.setItem('securityEnabled', 'true');
@@ -127,7 +212,8 @@ export default function SecuritySetupScreen() {
             [{ text: 'OK', onPress: () => router.replace('/profile') }]
           );
         } catch (error) {
-          Alert.alert('Error', 'Failed to save PIN.');
+          console.error('PIN setup error:', error);
+          Alert.alert('Error', 'Failed to save PIN. Please try again.');
         } finally {
           setLoading(false);
         }
@@ -241,17 +327,56 @@ export default function SecuritySetupScreen() {
       {((step === 'setup-pin' && pin.length === 4) || 
         (step === 'confirm-pin' && confirmPin.length === 4)) && (
         <TouchableOpacity
-          style={[styles.continueButton, { backgroundColor: primaryColor }]}
+          style={[styles.continueButton, { backgroundColor: primaryColor, opacity: loading ? 0.6 : 1 }]}
           onPress={handlePinContinue}
           disabled={loading}
         >
-          <Text style={styles.continueButtonText}>
-            {step === 'setup-pin' ? 'Continue' : 'Confirm'}
-          </Text>
+          {loading ? (
+            <ActivityIndicator size="small" color="white" />
+          ) : (
+            <Text style={styles.continueButtonText}>
+              {step === 'setup-pin' ? 'Continue' : 'Confirm'}
+            </Text>
+          )}
         </TouchableOpacity>
       )}
     </View>
   );
+
+  if (loading && selectedMethod === 'biometric') {
+    return (
+      <SafeAreaView style={styles.container}>
+        <View style={styles.header}>
+          <TouchableOpacity 
+            style={styles.backButton} 
+            onPress={() => {
+              if (isSwitch) {
+                router.replace('/profile');
+              } else {
+                setStep('choose');
+                setSelectedMethod(null);
+                setLoading(false);
+              }
+            }}
+          >
+            <Ionicons name="arrow-back" size={24} color={primaryColor} />
+          </TouchableOpacity>
+          <Text style={styles.headerTitle}>{isSwitch ? 'Change Security' : 'Security Setup'}</Text>
+          <View style={styles.placeholder} />
+        </View>
+        <View style={styles.centerContent}>
+          <View style={styles.iconContainer}>
+            <View style={[styles.iconBackground, { backgroundColor: primaryColor }]}>
+              <Ionicons name="finger-print" size={32} color="white" />
+            </View>
+          </View>
+          <Text style={styles.title}>Setting up Biometric...</Text>
+          <Text style={styles.subtitle}>Please follow the prompts to authenticate</Text>
+          <ActivityIndicator size="large" color={primaryColor} style={styles.loadingIndicator} />
+        </View>
+      </SafeAreaView>
+    );
+  }
 
   return (
     <SafeAreaView style={styles.container}>
@@ -417,5 +542,8 @@ const styles = StyleSheet.create({
     color: 'white',
     fontSize: 16,
     fontWeight: '600',
+  },
+  loadingIndicator: {
+    marginTop: 24,
   },
 });

@@ -24,7 +24,7 @@ export default function OTPVerificationScreen() {
   const [canResend, setCanResend] = useState(false);
 
   const primaryColor = Platform.OS === 'android' ? '#4CAF50' : '#4F7DF3';
-  const API_BASE_URL = 'http://192.168.216.153:3001/api';
+  const API_BASE_URL = 'http://192.168.110.153:3001/api';
 
   useEffect(() => {
     const timer = setInterval(() => {

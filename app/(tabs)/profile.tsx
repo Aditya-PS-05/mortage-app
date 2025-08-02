@@ -9,7 +9,7 @@ import {
   Alert,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { router } from 'expo-router';
+import { router, useFocusEffect } from 'expo-router';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as LocalAuthentication from 'expo-local-authentication';
 
@@ -30,6 +30,13 @@ export default function ProfileScreen() {
     loadUserData();
     loadSecurityMethod();
   }, []);
+
+  useFocusEffect(
+    React.useCallback(() => {
+      // Reload security method when screen comes into focus
+      loadSecurityMethod();
+    }, [])
+  );
 
   const loadUserData = async () => {
     try {

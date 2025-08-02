@@ -43,7 +43,7 @@ export default function SignupScreen() {
 
   // const BACKEND_BASE_URL = process.env.BACKEND_BASE_URL;
 
-  const API_BASE_URL = 'http://192.168.216.153:3001/api';
+  const API_BASE_URL = 'http://192.168.110.153:3001/api';
 
   const handleInputChange = (field: string, value: string) => {
     setFormData(prev => ({ ...prev, [field]: value }));

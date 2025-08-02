@@ -14,24 +14,67 @@ export default function TabLayout() {
   return (
     <Tabs
       screenOptions={{
-        tabBarActiveTintColor: Colors[colorScheme ?? 'light'].tint,
+        tabBarActiveTintColor: '#4CAF50',
+        tabBarInactiveTintColor: '#81C784',
         headerShown: false,
         tabBarButton: HapticTab,
-        tabBarBackground: TabBarBackground,
-        tabBarStyle: Platform.select({
-          ios: {
-            // Use a transparent background on iOS to show the blur effect
-            position: 'absolute',
+        tabBarStyle: {
+          backgroundColor: '#ffffff',
+          borderTopWidth: 1,
+          borderTopColor: '#e0e0e0',
+          paddingTop: 8,
+          paddingBottom: Platform.OS === 'ios' ? 20 : 8,
+          height: Platform.OS === 'ios' ? 90 : 70,
+          elevation: 8,
+          shadowColor: '#000',
+          shadowOffset: {
+            width: 0,
+            height: -2,
           },
-          default: {},
-        }),
+          shadowOpacity: 0.1,
+          shadowRadius: 4,
+        },
+        tabBarLabelStyle: {
+          fontSize: 12,
+          fontWeight: '600',
+          marginTop: 4,
+        },
       }}>
+      <Tabs.Screen
+        name="dashboard"
+        options={{
+          title: 'Dashboard',
+          tabBarIcon: ({ color, focused }) => (
+            <IconSymbol 
+              size={24} 
+              name={focused ? "chart.bar.fill" : "chart.bar"} 
+              color={color} 
+            />
+          ),
+        }}
+      />
+
+      <Tabs.Screen
+        name="profile"
+        options={{
+          title: 'Profile',
+          tabBarIcon: ({ color, focused }) => (
+            <IconSymbol 
+              size={24} 
+              name={focused ? "person.circle.fill" : "person.circle"} 
+              color={color} 
+            />
+          ),
+        }}
+      />
+
       <Tabs.Screen
         name="index"
         options={{
           title: 'Home',
           tabBarIcon: ({ color }) => <IconSymbol size={28} name="house.fill" color={color} />,
           tabBarStyle: { display: 'none' },
+          href: null,
         }}
       />
 
@@ -41,6 +84,7 @@ export default function TabLayout() {
           title: 'Signup',
           tabBarIcon: ({ color }) => <IconSymbol size={28} name="house.fill" color={color} />,
           tabBarStyle: { display: 'none' },
+          href: null,
         }}
       />
 
@@ -50,15 +94,7 @@ export default function TabLayout() {
           title: 'Login',
           tabBarIcon: ({ color }) => <IconSymbol size={28} name="person.fill" color={color} />,
           tabBarStyle: { display: 'none' },
-        }}
-      />
-
-      <Tabs.Screen
-        name="profile"
-        options={{
-          title: 'Profile',
-          tabBarIcon: ({ color }) => <IconSymbol size={28} name="person.fill" color={color} />,
-          tabBarStyle: { display: 'none' },
+          href: null,
         }}
       />
 
@@ -68,6 +104,7 @@ export default function TabLayout() {
           title: 'AuthGateScreen',
           tabBarIcon: ({ color }) => <IconSymbol size={28} name="house.fill" color={color} />,
           tabBarStyle: { display: 'none' },
+          href: null,
         }}
       />
 
@@ -77,6 +114,7 @@ export default function TabLayout() {
           title: 'SecuritySetupScreen',
           tabBarIcon: ({ color }) => <IconSymbol size={28} name="house.fill" color={color} />,
           tabBarStyle: { display: 'none' },
+          href: null,
         }}
       />
 
@@ -86,6 +124,7 @@ export default function TabLayout() {
           title: 'OTPVerificationScreen',
           tabBarIcon: ({ color }) => <IconSymbol size={28} name="mail.fill" color={color} />,
           tabBarStyle: { display: 'none' },
+          href: null,
         }}
       />
     </Tabs>

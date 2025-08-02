@@ -38,7 +38,7 @@ export default function LoginScreen() {
     }
   }, [params.email, params.phone]);
 
-  const API_BASE_URL = 'http://192.168.216.153:3001/api';
+  const API_BASE_URL = 'http://192.168.110.153:3001/api';
 
   const handleInputChange = (field: string, value: string) => {
     setFormData(prev => ({ ...prev, [field]: value }));
@@ -244,7 +244,7 @@ export default function LoginScreen() {
 
         {/* Create Account Link */}
         <View style={styles.createAccountContainer}>
-          <Text style={styles.createAccountText}>Don't have an account? </Text>
+          <Text style={styles.createAccountText}>Don&apos;t have an account? </Text>
           <TouchableOpacity onPress={() => router.push({ pathname: '/signup', params })}>
             <Text style={styles.createAccountLink}>Create Account</Text>
           </TouchableOpacity>

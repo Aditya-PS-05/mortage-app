@@ -14,7 +14,9 @@ import {
   View
 } from 'react-native';
 
-type OnboardingStep = 'hello' | 'introduction' | 'askUser' | 'userInfo' | 'choicePoint' | 'education';
+import MortgageDashboard from '../../components/MortgageDashboard';
+
+type OnboardingStep = 'hello' | 'introduction' | 'askUser' | 'userInfo' | 'choicePoint' | 'education' | 'calculator';
 
 interface UserInfo {
   name: string;
@@ -87,6 +89,9 @@ export default function HomeScreen() {
     } else if (currentStep === 'choicePoint') {
       setCurrentStep('education');
       animateStep();
+    } else if (currentStep === 'education') {
+      setCurrentStep('calculator');
+      animateStep();
     }
   };
 
@@ -105,6 +110,9 @@ export default function HomeScreen() {
       animateStep();
     } else if (currentStep === 'education') {
       setCurrentStep('choicePoint');
+      animateStep();
+    } else if (currentStep === 'calculator') {
+      setCurrentStep('education');
       animateStep();
     }
   };
@@ -313,7 +321,7 @@ export default function HomeScreen() {
           </Text>
           <Text style={styles.sectionSubTitle}>Purpose:</Text>
           <Text style={styles.sectionText}>
-            FICO scores are numerical representations of a consumer's credit risk, based on information from their credit reports. 
+            FICO scores are numerical representations of a consumer&apos;s credit risk, based on information from their credit reports. 
             Lenders use these scores to assess loan applications, set interest rates, and determine credit limits.
           </Text>
           <Text style={styles.sectionSubTitle}>Key Details:</Text>
@@ -355,20 +363,36 @@ export default function HomeScreen() {
           <Text style={styles.bulletPoint}>2. Calculate gross monthly income (before taxes)</Text>
           <Text style={styles.bulletPoint}>3. Divide total debt by gross income</Text>
           <Text style={styles.formula}>DTI = Total Monthly Debt / Gross Monthly Income</Text>
-          <Text style={styles.sectionSubTitle}>What's Considered Good:</Text>
+          <Text style={styles.sectionSubTitle}>What&apos;s Considered Good:</Text>
           <Text style={styles.bulletPoint}>• Typically 40-45% (maximum 50%)</Text>
           <Text style={styles.bulletPoint}>• Lower DTI = less risky borrower</Text>
           <Text style={styles.bulletPoint}>• Lenders use DTI to assess repayment ability</Text>
         </View>
 
-        <TouchableOpacity 
-          style={[styles.getStartedButton, { backgroundColor: currentColors.primary }]} 
-          onPress={() => router.push({ pathname: '/login', params: userInfo })}
-        >
-          <Text style={styles.getStartedButtonText}>Start Your Application</Text>
-        </TouchableOpacity>
+        <View style={styles.buttonContainer}>
+          <TouchableOpacity 
+            style={[styles.actionButton, { backgroundColor: currentColors.primary }]} 
+            onPress={handleNext}
+          >
+            <Text style={styles.actionButtonText}>Try Calculator</Text>
+          </TouchableOpacity>
+          
+          <TouchableOpacity 
+            style={[styles.actionButton, styles.secondaryActionButton, { borderColor: currentColors.primary }]} 
+            onPress={() => router.push({ pathname: '/login', params: userInfo })}
+          >
+            <Text style={[styles.actionButtonText, { color: currentColors.primary }]}>Start Application</Text>
+          </TouchableOpacity>
+        </View>
       </View>
     </ScrollView>
+  );
+
+  const renderCalculator = () => (
+    <View style={[styles.container, { backgroundColor: currentColors.background }]}>
+      {renderBackButton()}
+      <MortgageDashboard />
+    </View>
   );
 
   useEffect(() => {
@@ -388,6 +412,8 @@ export default function HomeScreen() {
       return renderChoicePoint();
     case 'education':
       return renderEducation();
+    case 'calculator':
+      return renderCalculator();
     default:
       return renderHelloScreen();
   }
@@ -563,6 +589,26 @@ const styles = StyleSheet.create({
   getStartedButtonText: {
     color: 'white',
     fontSize: 18,
+    fontWeight: '600',
+    textAlign: 'center',
+  },
+  buttonContainer: {
+    gap: 16,
+    marginTop: 24,
+    marginBottom: 32,
+  },
+  actionButton: {
+    paddingHorizontal: 32,
+    paddingVertical: 16,
+    borderRadius: 12,
+  },
+  secondaryActionButton: {
+    backgroundColor: 'transparent',
+    borderWidth: 2,
+  },
+  actionButtonText: {
+    color: 'white',
+    fontSize: 16,
     fontWeight: '600',
     textAlign: 'center',
   },

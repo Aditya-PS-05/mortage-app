@@ -26,7 +26,7 @@ app.use(limiter);
 app.use(cors({
   origin: process.env.NODE_ENV === 'production' 
     ? ['https://yourdomain.com'] 
-    : ['http://localhost:3000', 'http://localhost:8081', 'http://192.168.104.153:8081'], // Add Expo dev server
+    : ['http://localhost:3000', 'http://localhost:8081', 'http://192.168.1.64:8081'], // Add Expo dev server
   credentials: true
 }));
 app.use(express.json({ limit: '10mb' }));
