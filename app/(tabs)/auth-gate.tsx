@@ -37,11 +37,11 @@ export default function AuthGateScreen() {
         }
       } else {
         // No security setup, go to main app
-        router.replace('/profile');
+        router.replace('/home');
       }
     } catch (error) {
       console.error('Failed to check security setup:', error);
-      router.replace('/profile');
+      router.replace('/home');
     } finally {
       setLoading(false);
     }
@@ -56,7 +56,7 @@ export default function AuthGateScreen() {
       });
 
       if (result.success) {
-        router.replace('/profile');
+        router.replace('/home');
       } else {
         if (result.error === 'user_cancel') {
           Alert.alert('Authentication Required', 'You must authenticate to access the app.');
@@ -91,7 +91,7 @@ export default function AuthGateScreen() {
       try {
         const storedPin = await AsyncStorage.getItem('securityPin');
         if (pin === storedPin) {
-          router.replace('/profile');
+          router.replace('/home');
         } else {
           const newAttempts = authAttempts + 1;
           setAuthAttempts(newAttempts);
@@ -134,7 +134,7 @@ export default function AuthGateScreen() {
               'userToken',
               'userData'
             ]);
-            router.replace('/');
+            router.replace('/login');
           }
         }
       ]

@@ -199,7 +199,7 @@ export default function HomeScreen() {
                 <Text style={styles.actionText}>Upload Documents</Text>
               </TouchableOpacity>
               
-              <TouchableOpacity style={styles.actionCard}>
+              <TouchableOpacity style={styles.actionCard} onPress={() => router.push('/dashboard')}>
                 <View style={styles.actionIcon}>
                   <Ionicons name="calculator-outline" size={24} color="#4CAF50" />
                 </View>

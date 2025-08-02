@@ -48,7 +48,7 @@ export default function SecuritySetupScreen() {
           [{ text: 'OK', onPress: () => {
             setLoading(false);
             if (isSwitch) {
-              router.replace('/profile');
+              router.replace('/home');
             } else {
               setStep('choose');
               setSelectedMethod(null);
@@ -97,7 +97,7 @@ export default function SecuritySetupScreen() {
           errorMessage,
           [{ text: 'OK', onPress: () => {
             if (isSwitch) {
-              router.replace('/profile');
+              router.replace('/home');
             } else {
               setStep('choose');
               setSelectedMethod(null);
@@ -112,7 +112,7 @@ export default function SecuritySetupScreen() {
         'Failed to set up biometric authentication. Please try again.',
         [{ text: 'OK', onPress: () => {
           if (isSwitch) {
-            router.replace('/profile');
+            router.replace('/home');
           } else {
             setStep('choose');
             setSelectedMethod(null);
@@ -351,7 +351,7 @@ export default function SecuritySetupScreen() {
             style={styles.backButton} 
             onPress={() => {
               if (isSwitch) {
-                router.replace('/profile');
+                router.replace('/home');
               } else {
                 setStep('choose');
                 setSelectedMethod(null);
