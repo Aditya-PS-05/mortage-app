@@ -44,7 +44,7 @@ const styles = StyleSheet.create({
   },
   content: {
     padding: 16,
-    paddingTop: Platform.OS === 'ios' ? 20 : 16,
+    paddingTop: Platform.OS === 'ios' ? 40 : 32,
     paddingBottom: 32,
   },
 });

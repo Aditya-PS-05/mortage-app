@@ -21,18 +21,18 @@ export default function TabLayout() {
         tabBarStyle: {
           backgroundColor: '#ffffff',
           borderTopWidth: 1,
-          borderTopColor: '#e0e0e0',
+          borderTopColor: '#f0f0f0',
           paddingTop: 8,
           paddingBottom: Platform.OS === 'ios' ? 20 : 8,
           height: Platform.OS === 'ios' ? 90 : 70,
-          elevation: 8,
-          shadowColor: '#000',
+          elevation: 4,
+          shadowColor: '#e0e0e0',
           shadowOffset: {
             width: 0,
-            height: -2,
+            height: -1,
           },
-          shadowOpacity: 0.1,
-          shadowRadius: 4,
+          shadowOpacity: 0.15,
+          shadowRadius: 3,
         },
         tabBarLabelStyle: {
           fontSize: 12,
@@ -41,13 +41,27 @@ export default function TabLayout() {
         },
       }}>
       <Tabs.Screen
+        name="home"
+        options={{
+          title: 'Home',
+          tabBarIcon: ({ color }) => (
+            <IconSymbol 
+              size={24} 
+              name="house" 
+              color={color} 
+            />
+          ),
+        }}
+      />
+
+      <Tabs.Screen
         name="dashboard"
         options={{
           title: 'Dashboard',
-          tabBarIcon: ({ color, focused }) => (
+          tabBarIcon: ({ color }) => (
             <IconSymbol 
               size={24} 
-              name={focused ? "chart.bar.fill" : "chart.bar"} 
+              name="chart.bar" 
               color={color} 
             />
           ),
@@ -58,10 +72,10 @@ export default function TabLayout() {
         name="profile"
         options={{
           title: 'Profile',
-          tabBarIcon: ({ color, focused }) => (
+          tabBarIcon: ({ color }) => (
             <IconSymbol 
               size={24} 
-              name={focused ? "person.circle.fill" : "person.circle"} 
+              name="person.circle" 
               color={color} 
             />
           ),
